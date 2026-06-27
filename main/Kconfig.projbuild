@@ -1117,6 +1117,21 @@ menu "Ghost ESP Options"
         help
             Define the UART RX pin baud rate for GPS.
 
+    config GPS_USE_SOFTWARE_RX
+        bool "Use bit-banged software GPS RX (RMT)"
+        default n
+        depends on HAS_GPS
+        help
+            Read GPS NMEA over a bit-banged software UART (via RMT) instead of a
+            hardware UART, and keep DualComm/GhostLink on the hardware UART.
+            Use this on ESP32-C5 boards that also drive an I2C touch panel: on a
+            single-core C5 the hardware-UART GPS handoff briefly disables
+            interrupts and can deadlock against concurrent I2C touch traffic
+            (interrupt watchdog timeout / freeze when opening GPS). Boards
+            without an I2C touch panel (e.g. SPI XPT2046) do not need this.
+            Note: on ESP32-C5 soft RX temporarily takes over the RMT channel
+            used by the NeoPixel while GPS is active.
+
     config NMEA_PARSER_RING_BUFFER_SIZE
         int "NMEA Parser Ring Buffer Size"
         range 0 2048

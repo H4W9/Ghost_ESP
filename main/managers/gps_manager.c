@@ -532,6 +532,11 @@ static bool gps_manager_get_wd_lite(gps_wd_lite_t *out, bool *using_peer) {
 }
 
 static bool gps_should_preserve_dualcomm(void) {
+#ifdef CONFIG_GPS_USE_SOFTWARE_RX
+    /* Soft RX bit-bangs GPS on its own pin, so the hardware UART stays free
+       for DualComm — keep it rather than tearing it down for GPS. */
+    return true;
+#endif
 #ifdef CONFIG_BUILD_CONFIG_TEMPLATE
     if (strcmp(CONFIG_BUILD_CONFIG_TEMPLATE, "somethingsomething") == 0 ||
         strcmp(CONFIG_BUILD_CONFIG_TEMPLATE, "somethingsomething2") == 0) {
@@ -542,6 +547,9 @@ static bool gps_should_preserve_dualcomm(void) {
 }
 
 static bool gps_should_use_software_rx(void) {
+#ifdef CONFIG_GPS_USE_SOFTWARE_RX
+    return true;
+#endif
 #ifdef CONFIG_BUILD_CONFIG_TEMPLATE
     if (strcmp(CONFIG_BUILD_CONFIG_TEMPLATE, "somethingsomething") == 0) {
         return true;
