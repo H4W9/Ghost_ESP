@@ -133,7 +133,12 @@ void tp_spi_read_reg(uint8_t reg, uint8_t* data, uint8_t byte_count)
 static bool tp_spi_use_nm_cyd_c5_xpt2046_path(void)
 {
 #if defined(CONFIG_LV_TOUCH_CONTROLLER_XPT2046) && defined(CONFIG_BUILD_CONFIG_TEMPLATE)
-	return strcmp(CONFIG_BUILD_CONFIG_TEMPLATE, "NM-CYD-C5") == 0;
+	/* ESP32-C5 boards with an XPT2046 on the shared display SPI bus need this
+	 * full-duplex 24-bit read path. The standard half-duplex path mis-frames
+	 * on the C5 and returns noisy Z values, producing phantom touches.
+	 * Marauder V8 is the same hardware class as the NM-CYD-C5. */
+	return strcmp(CONFIG_BUILD_CONFIG_TEMPLATE, "NM-CYD-C5") == 0 ||
+	       strcmp(CONFIG_BUILD_CONFIG_TEMPLATE, "Marauder V8") == 0;
 #else
 	return false;
 #endif
