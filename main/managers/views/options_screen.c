@@ -1,4 +1,6 @@
 #include "managers/views/options_screen.h"
+#include "esp_ota_ops.h"
+#include "esp_partition.h"
 #include "managers/views/lockscreen.h"
 #include "core/serial_manager.h"
 #include "core/commandline.h"
@@ -1302,6 +1304,9 @@ static SettingsItem settings_items[] = {
     {"Power Saving Mode", SETTING_POWER_SAVE, bool_options, 2, 0, SETTINGS_CAT_POWER, false, NULL, SETTING_WIDGET_TOGGLE},
 #if CONFIG_IDF_TARGET_ESP32S3
     {"USB Host Mode", SETTING_USB_HOST_MODE, bool_options, 2, 0, SETTINGS_CAT_POWER, true, "CONFIG_IDF_TARGET_ESP32S3", SETTING_WIDGET_TOGGLE},
+#endif
+#ifdef CONFIG_GHOST_DUAL_BOOT
+    {"Boot OTA_1", SETTING_BOOT_OTA1, action_options, 1, 0, SETTINGS_CAT_POWER, false, NULL, SETTING_WIDGET_VALUE_CYCLE},
 #endif
     {"Auto Save Scans", SETTING_AUTO_SAVE_SCANS, bool_options, 2, 1, SETTINGS_CAT_SCAN_SAVING, false, NULL, SETTING_WIDGET_TOGGLE},
     {"Run Setup Wizard", SETTING_RUN_SETUP_WIZARD, action_options, 1, 0, SETTINGS_CAT_SYSTEM_TOOLS, false, NULL, SETTING_WIDGET_VALUE_CYCLE},
@@ -3038,6 +3043,18 @@ static void apply_setting_change(int setting_index, int new_value) {
             display_manager_switch_view(&terminal_view);
             io_manager_scan_i2c();
             return;
+#ifdef CONFIG_GHOST_DUAL_BOOT
+        case SETTING_BOOT_OTA1: {
+            // Dual-boot: switch to Marauder (ota_1) and restart
+            const esp_partition_t *marauder = esp_partition_find_first(
+                ESP_PARTITION_TYPE_APP, ESP_PARTITION_SUBTYPE_APP_OTA_1, NULL);
+            if (marauder) {
+                esp_ota_set_boot_partition(marauder);
+            }
+            esp_restart();
+            return;
+        }
+#endif
         case SETTING_EXPORT_SETTINGS_SD: {
             esp_err_t err = settings_backup_export_to_sd();
             if (err == ESP_OK) {

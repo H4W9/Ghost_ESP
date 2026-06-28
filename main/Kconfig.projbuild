@@ -189,6 +189,15 @@ menu "Ghost ESP Options"
 
     menu "Misc Options"
 
+        config GHOST_DUAL_BOOT
+            bool "Enable Dual Boot (Boot OTA_1 / Marauder)"
+            default n
+            help
+                Adds a "Boot OTA_1" item to Settings > General > Power that
+                sets the ota_1 app partition as the boot target and restarts
+                (used to switch into ESP32 Marauder). Requires a dual-boot
+                partition table (ota_0 + ota_1).
+
         config USE_JOYSTICK
             bool "Enable Joystick"
             default n

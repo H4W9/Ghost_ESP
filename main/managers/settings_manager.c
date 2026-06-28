@@ -1050,6 +1050,7 @@ void settings_persist_setting(SettingsType setting) {
 #endif
         case SETTING_RUN_SETUP_WIZARD:
         case SETTING_I2C_SCAN:
+        case SETTING_BOOT_OTA1:
         case SETTING_WIGLE_TEST_API:
         case SETTING_WIGLE_HELP:
         case SETTING_WIGLE_MANUAL_UPLOAD:
