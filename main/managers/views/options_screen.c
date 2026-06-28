@@ -1,6 +1,9 @@
 #include "managers/views/options_screen.h"
+#include "sdkconfig.h"
+#ifdef CONFIG_GHOST_DUAL_BOOT
 #include "esp_ota_ops.h"
 #include "esp_partition.h"
+#endif
 #include "managers/views/lockscreen.h"
 #include "core/serial_manager.h"
 #include "core/commandline.h"
